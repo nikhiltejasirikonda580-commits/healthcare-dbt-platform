@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: mart_patient_360
+    columns:
+      - name: patient_id
+        tests: [not_null, unique]
+
+  - name: mart_utilization_monthly
+    columns:
+      - name: utilization_month_sk
+        tests: [not_null, unique]
+
+  - name: mart_condition_burden
+    columns:
+      - name: patient_id
+        tests: [not_null, unique]
+
+  - name: mart_provider_performance
+    columns:
+      - name: provider_month_sk
+        tests: [not_null, unique]
+
+  - name: mart_claim_cost_summary
+    columns:
+      - name: claim_cost_summary_sk
+        tests: [not_null, unique]

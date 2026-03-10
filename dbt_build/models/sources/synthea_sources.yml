@@ -1,0 +1,21 @@
+version: 2
+
+sources:
+  - name: synthea
+    schema: raw
+    tables:
+      - name: patients
+      - name: providers
+      - name: organizations
+      - name: payers
+      - name: payer_transitions
+      - name: encounters
+      - name: conditions
+      - name: medications
+      - name: observations
+      - name: immunizations
+      - name: devices
+      - name: supplies
+      - name: allergies
+      - name: careplans
+      - name: claims_transactions

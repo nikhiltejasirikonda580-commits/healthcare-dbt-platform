@@ -1,0 +1,12 @@
+healthcare_dbt:
+  outputs:
+    dev:
+      dbname: healthcare
+      host: postgres
+      pass: dbt
+      port: 5432
+      schema: stg
+      threads: 10
+      type: postgres
+      user: dbt
+  target: dev

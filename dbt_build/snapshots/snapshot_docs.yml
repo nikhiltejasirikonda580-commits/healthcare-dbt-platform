@@ -1,0 +1,21 @@
+version: 2
+
+snapshots:
+
+  - name: patient_snapshot
+    description: >
+      Slowly Changing Dimension Type 2 snapshot tracking historical changes
+      to patient demographic attributes.
+
+  - name: provider_snapshot
+    description: >
+      Slowly Changing Dimension Type 2 snapshot capturing changes to provider
+      attributes such as specialty or organizational affiliation.
+
+  - name: payer_snapshot
+    description: >
+      Snapshot tracking changes in payer attributes and coverage statistics.
+
+  - name: organization_snapshot
+    description: >
+      Snapshot capturing historical changes to healthcare organization attributes.

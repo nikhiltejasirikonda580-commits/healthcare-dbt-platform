@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: hdbt_postgres
+    environment:
+      POSTGRES_USER: dbt
+      POSTGRES_PASSWORD: dbt
+      POSTGRES_DB: healthcare
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer:4
+    container_name: hdbt_adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+  dbt:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dbt
+    container_name: hdbt_dbt
+    depends_on:
+      - postgres
+    volumes:
+      - ..:/workspace
+    working_dir: /workspace/dbt_build
+    command: ["bash", "-lc", "sleep infinity"]
+    ports:
+      - "8081:8081"
+
+volumes:
+  pgdata:
+
+  

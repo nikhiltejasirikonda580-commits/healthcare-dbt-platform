@@ -1,0 +1,123 @@
+version: 2
+
+models:
+  - name: stg_patients
+    columns:
+      - name: patient_id
+        tests: [not_null, unique]
+
+  - name: stg_providers
+    columns:
+      - name: provider_id
+        tests: [not_null, unique]
+
+  - name: stg_organizations
+    columns:
+      - name: organization_id
+        tests: [not_null, unique]
+
+  - name: stg_payers
+    columns:
+      - name: payer_id
+        tests: [not_null, unique]
+
+  - name: stg_payer_transitions
+    columns:
+      - name: patient_payer_transition_id
+        tests: [not_null, unique]
+      - name: patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_patients')
+              field: patient_id
+      - name: payer_id
+        tests:
+          - relationships:
+              to: ref('stg_payers')
+              field: payer_id
+
+  - name: stg_encounters
+    columns:
+      - name: encounter_id
+        tests: [not_null, unique]
+      - name: patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_patients')
+              field: patient_id
+
+  - name: stg_conditions
+    columns:
+      - name: condition_occurrence_id
+        tests: [not_null, unique]
+      - name: patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_patients')
+              field: patient_id
+
+  - name: stg_medications
+    columns:
+      - name: medication_event_id
+        tests: [not_null, unique]
+      - name: patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_patients')
+              field: patient_id
+
+  - name: stg_observations
+    columns:
+      - name: observation_id
+        tests: [not_null]
+      - name: patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_patients')
+              field: patient_id
+
+  - name: stg_immunizations
+    columns:
+      - name: immunization_id
+        tests: [not_null, unique]
+      - name: patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_patients')
+              field: patient_id
+
+  - name: stg_devices
+    columns:
+      - name: device_event_id
+        tests: [not_null, unique]
+
+  - name: stg_supplies
+    columns:
+      - name: supply_event_id
+        tests: [not_null]
+
+  - name: stg_allergies
+    columns:
+      - name: allergy_event_id
+        tests: [not_null, unique]
+
+  - name: stg_careplans
+    columns:
+      - name: careplan_id
+        tests: [not_null, unique]
+
+  - name: stg_claims_transactions
+    columns:
+      - name: claim_transaction_id
+        tests: [not_null, unique]
+      - name: patient_id
+        tests:
+          - relationships:
+              to: ref('stg_patients')
+              field: patient_id

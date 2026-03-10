@@ -1,0 +1,203 @@
+version: 2
+
+models:
+  - name: dim_patient
+    columns:
+      - name: patient_id
+        tests: [not_null, unique]
+      - name: current_age
+        tests:
+          - accepted_range:
+              min_value: 0
+              max_value: 120
+
+  - name: dim_provider
+    columns:
+      - name: provider_id
+        tests: [not_null, unique]
+
+  - name: dim_organization
+    columns:
+      - name: organization_id
+        tests: [not_null, unique]
+
+  - name: dim_payer
+    columns:
+      - name: payer_id
+        tests: [not_null, unique]
+
+  - name: bridge_patient_payer_coverage
+    columns:
+      - name: patient_payer_coverage_sk
+        tests: [not_null, unique]
+      - name: patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_patient')
+              field: patient_id
+      - name: payer_id
+        tests:
+          - relationships:
+              to: ref('dim_payer')
+              field: payer_id
+
+  - name: fct_encounter
+    columns:
+      - name: encounter_id
+        tests: [not_null, unique]
+      - name: patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_patient')
+              field: patient_id
+      - name: provider_id
+        tests:
+          - relationships:
+              to: ref('dim_provider')
+              field: provider_id
+      - name: organization_id
+        tests:
+          - relationships:
+              to: ref('dim_organization')
+              field: organization_id
+      - name: payer_id
+        tests:
+          - relationships:
+              to: ref('dim_payer')
+              field: payer_id
+      - name: base_encounter_cost
+        tests:
+          - non_negative:
+              column_name: base_encounter_cost
+      - name: total_claim_cost
+        tests:
+          - non_negative:
+              column_name: total_claim_cost
+      - name: payer_coverage
+        tests:
+          - non_negative:
+              column_name: payer_coverage
+      - name: patient_liability_amount
+        tests:
+          - non_negative:
+              column_name: patient_liability_amount
+      - name: encounter_duration_minutes
+        tests:
+          - non_negative:
+              column_name: encounter_duration_minutes
+
+    tests:
+      - end_after_start:
+          start_column: encounter_start_ts
+          end_column: encounter_end_ts
+
+  - name: fct_condition
+    columns:
+      - name: condition_occurrence_id
+        tests: [not_null, unique]
+      - name: patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_patient')
+              field: patient_id
+      - name: encounter_id
+        tests:
+          - relationships:
+              to: ref('fct_encounter')
+              field: encounter_id
+      - name: condition_duration_days
+        tests:
+          - non_negative:
+              column_name: condition_duration_days
+
+    tests:
+      - end_after_start:
+          start_column: condition_start_date
+          end_column: condition_end_date
+
+  - name: fct_medication
+    columns:
+      - name: medication_event_id
+        tests: [not_null, unique]
+      - name: patient_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_patient')
+              field: patient_id
+      - name: encounter_id
+        tests:
+          - relationships:
+              to: ref('fct_encounter')
+              field: encounter_id
+      - name: base_cost
+        tests:
+          - non_negative:
+              column_name: base_cost
+      - name: payer_coverage
+        tests:
+          - non_negative:
+              column_name: payer_coverage
+      - name: total_cost
+        tests:
+          - non_negative:
+              column_name: total_cost
+      - name: patient_out_of_pocket_cost
+        tests:
+          - non_negative:
+              column_name: patient_out_of_pocket_cost
+      - name: dispense_count
+        tests:
+          - non_negative:
+              column_name: dispense_count
+
+    tests:
+      - end_after_start:
+          start_column: medication_start_date
+          end_column: medication_end_date
+
+  - name: fct_claim_line
+    columns:
+      - name: claim_transaction_id
+        tests: [not_null, unique]
+      - name: patient_id
+        tests:
+          - relationships:
+              to: ref('dim_patient')
+              field: patient_id
+      - name: provider_id
+        tests:
+          - relationships:
+              to: ref('dim_provider')
+              field: provider_id
+      - name: unit_count
+        tests:
+          - non_negative:
+              column_name: unit_count
+      - name: unit_amount
+        tests:
+          - non_negative:
+              column_name: unit_amount
+      - name: transaction_amount
+        tests:
+          - non_negative:
+              column_name: transaction_amount
+      - name: payment_amount
+        tests:
+          - non_negative:
+              column_name: payment_amount
+      - name: adjustment_amount
+        tests:
+          - non_negative:
+              column_name: adjustment_amount
+      - name: transfer_amount
+        tests:
+          - non_negative:
+              column_name: transfer_amount
+      - name: outstanding_amount
+        tests:
+          - non_negative:
+              column_name: outstanding_amount

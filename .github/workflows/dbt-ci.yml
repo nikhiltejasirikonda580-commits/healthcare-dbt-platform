@@ -1,0 +1,84 @@
+name: dbt CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  dbt-ci:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: dbt
+          POSTGRES_PASSWORD: dbt
+          POSTGRES_DB: healthcare
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U dbt -d healthcare"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DBT_PROFILES_DIR: .github/dbt
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dbt
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core dbt-postgres psycopg2-binary
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Create schemas
+        run: |
+          psql -h localhost -U dbt -d healthcare -c "create schema if not exists raw;"
+          psql -h localhost -U dbt -d healthcare -c "create schema if not exists snapshots;"
+        env:
+          PGPASSWORD: dbt
+
+      - name: Load sample source data
+        run: |
+          python .github/scripts/load_ci_data.py
+        env:
+          PGPASSWORD: dbt
+
+      - name: dbt deps
+        working-directory: dbt_build
+        run: dbt deps
+
+      - name: dbt debug
+        working-directory: dbt_build
+        run: dbt debug
+
+      - name: dbt parse
+        working-directory: dbt_build
+        run: dbt parse
+
+      - name: dbt build
+        working-directory: dbt_build
+        run: dbt build
+
+      - name: dbt snapshot
+        working-directory: dbt_build
+        run: dbt snapshot
+
+      - name: dbt test
+        working-directory: dbt_build
+        run: dbt test
