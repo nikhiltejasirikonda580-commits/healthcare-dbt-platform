@@ -123,7 +123,6 @@ final as (
         p.income,
         p.healthcare_expenses,
         p.healthcare_coverage,
-        p.has_healthcare_coverage_flag,
 
         coalesce(e.total_encounters, 0) as total_encounters,
         coalesce(e.active_months_with_encounters, 0) as active_months_with_encounters,
